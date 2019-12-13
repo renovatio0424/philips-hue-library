@@ -2,7 +2,7 @@ package com.reno.philipshuesampleapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.reno.philipshue.BulbManager
+import com.reno.philipshue.BridgeManager
 import com.reno.philipshue.model.Bulb
 
 class MainActivity : AppCompatActivity() {
@@ -11,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val manager = BulbManager()
+        val manager = BridgeManager()
         manager.getUserInfo()
         val disposable = manager.getBulbService()
             .subscribe {
