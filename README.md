@@ -4,9 +4,8 @@ Feature
 ======
 1. connect bridge
 2. get list of lights 
-3. get status of lights
-4. turn on or off the lights
-5. change hue & color of lights
+3. turn on or off the lights
+4. change hue & color of lights
 
 License
 =======
