@@ -7,6 +7,16 @@ Feature
 3. turn on or off the lights
 4. change hue & color of lights
 
+Requirement
+======
+you should add this properties at application manifests
+
+```xml
+//manifests
+<application
+    android:usesCleartextTraffic="true"/>
+```
+
 License
 =======
 
