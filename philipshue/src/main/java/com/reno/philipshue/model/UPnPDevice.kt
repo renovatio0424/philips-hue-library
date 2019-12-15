@@ -12,7 +12,7 @@ const val USN_TEXT = "USN: "
 const val ST_TEXT = "ST: "
 const val lineEnd = "\r\n"
 
-data class UPnPDevice (// From SSDP Packet
+data class UPnPDevice(// From SSDP Packet
     private val hostAddress: String, // SSDP Packet Header
     private val header: String
 ) {

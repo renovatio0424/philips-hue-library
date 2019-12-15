@@ -14,7 +14,7 @@ const val BRIDGE_BASE_URL: String = ""
 
 class BridgeManager(private val context: Context) : IBridgeManager {
     private val bridgeService: BridgeService = Injector.injectBridgeService(BRIDGE_BASE_URL)
-    private val uPnPManager: IUPnpDiscoveryManager = Injector.injectUPnPManager(context)
+    private val uPnPManager: IDiscoveryManager = Injector.injectUPnPManager(context)
 
     override fun connectBridge(
         onSuccess: (Bridge) -> Unit,
