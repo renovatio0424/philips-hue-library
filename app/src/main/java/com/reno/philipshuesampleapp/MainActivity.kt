@@ -1,19 +1,18 @@
 package com.reno.philipshuesampleapp
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.reno.philipshue.bridge.IUPnpDiscoveryManager
-import com.reno.philipshue.bridge.UPnPDiscoveryManager
-import com.reno.philipshue.model.UPnPDevice
+import com.reno.philipshue.bridge.IDiscoveryManager
+import com.reno.philipshue.bridge.NUPnPDiscoveryManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 const val TAG = "MainActivity"
@@ -39,33 +38,41 @@ class MainActivity : AppCompatActivity() {
         mAdapter = MyAdapter(myDataSet)
         mRecyclerView.adapter = mAdapter
 
-        val uPnPManager = UPnPDiscoveryManager.Builder(this).build()
-        uPnPManager.discoverDevices(object: IUPnpDiscoveryManager.UPnPListener {
-            override fun onStart() {
-                Log.d(TAG, "Start discovery")
-            }
+//        val uPnPManager = UPnPDiscoveryManager.Builder(this).build()
+//        uPnPManager.discoverDevices(object: IDiscoveryManager.DiscoverListener {
+//            override fun onStart() {
+//                Log.d(TAG, "Start discovery")
+//            }
+//
+//            override fun onFoundNewDevice(device: UPnPDevice) {
+//                Log.d(TAG, "Found new device")
+//                Log.d("App", device.location)
+//                myDataSet.add(device.toString())
+//                (mAdapter as MyAdapter).notifyDataSetChanged()
+//            }
+//
+//            override fun onFinish(devices: HashSet<UPnPDevice>) {
+//                // To do something
+//                Log.d(TAG,"Discovery finished")
+//            }
+//
+//            override fun onError(exception: Exception) {
+//                Log.d(TAG, "Error: " + exception.localizedMessage)
+//                exception.printStackTrace()
+//            }
+//
+//        })
 
-            override fun onFoundNewDevice(device: UPnPDevice) {
-                Log.d(TAG, "Found new device")
-                Log.d("App", device.location)
-                myDataSet.add(device.toString())
-                (mAdapter as MyAdapter).notifyDataSetChanged()
+        val discoverManager:IDiscoveryManager = NUPnPDiscoveryManager()
+        CoroutineScope(Dispatchers.IO).launch {
+            val bridge = discoverManager.getBridge()
+            launch(Dispatchers.Main) {
+                myDataSet.add(bridge[0].toString())
             }
-
-            override fun onFinish(devices: HashSet<UPnPDevice>) {
-                // To do something
-                Log.d(TAG,"Discovery finished")
-            }
-
-            override fun onError(exception: Exception) {
-                Log.d(TAG, "Error: " + exception.localizedMessage)
-                exception.printStackTrace()
-            }
-
-        })
+        }
     }
 
-    private class MyAdapter internal constructor(private val mDataset: ArrayList<String>) :
+    private class MyAdapter internal constructor(private val dataSet: ArrayList<String>) :
         RecyclerView.Adapter<MyAdapter.ViewHolder?>() {
 
         internal inner class ViewHolder(view: View) :
@@ -84,11 +91,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.mTextView.text = mDataset[position]
+            holder.mTextView.text = dataSet[position]
         }
 
         override fun getItemCount(): Int {
-            return mDataset.size
+            return dataSet.size
         }
 
     }
