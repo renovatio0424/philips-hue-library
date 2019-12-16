@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.reno.philipshue.bridge.IDiscoveryManager
 import com.reno.philipshue.bridge.NUPnPDiscoveryManager
+import com.reno.philipshue.bridge.UPnPDiscoveryManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -63,11 +64,21 @@ class MainActivity : AppCompatActivity() {
 //
 //        })
 
+        val uPnPDiscoveryManager = UPnPDiscoveryManager.Builder(this).build()
+        CoroutineScope(Dispatchers.IO).launch {
+            val uPnPDevices = uPnPDiscoveryManager.discoverDevices().toList()
+            uPnPDevices.forEach { myDataSet.add(it.toString()) }
+        }
+
+        myDataSet.add("END")
+
         val discoverManager:IDiscoveryManager = NUPnPDiscoveryManager()
         CoroutineScope(Dispatchers.IO).launch {
-            val bridge = discoverManager.getBridge()
+            val bridge = discoverManager.getBridges()
             launch(Dispatchers.Main) {
-                myDataSet.add(bridge[0].toString())
+                bridge.forEach {
+                    myDataSet.add(it.toString())
+                }
             }
         }
     }

@@ -5,7 +5,7 @@ import com.reno.philipshue.model.UPnPDevice
 
 interface IDiscoveryManager {
 //    fun discoverDevices(discoverListener: DiscoverListener)
-    suspend fun getBridge():List<Bridge>
+    suspend fun getBridges():List<Bridge>
 
     interface DiscoverListener {
         fun onStart()

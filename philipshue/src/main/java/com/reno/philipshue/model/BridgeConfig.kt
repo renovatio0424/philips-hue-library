@@ -12,3 +12,5 @@ data class BridgeConfig(
     val starterKitId: String,
     val swVersion: String
 )
+
+fun BridgeConfig.convertToBridge(ipAddress:String) = Bridge(this.bridgeId, ipAddress, this.mac, this.name)

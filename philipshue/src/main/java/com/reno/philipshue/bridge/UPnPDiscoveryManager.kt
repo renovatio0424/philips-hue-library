@@ -6,8 +6,12 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.reno.philipshue.injector.Injector
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.model.UPnPDevice
+import com.reno.philipshue.model.convertToBridge
+import com.reno.philipshue.model.isPhillipsHueBridge
+import com.reno.philipshue.network.UPnPService
 import kotlinx.coroutines.*
 import java.io.IOException
 import java.net.DatagramPacket
@@ -38,8 +42,75 @@ class UPnPDiscoveryManager(
     private val devices = hashSetOf<UPnPDevice>()
     private var threadCount = 0
 
-    override suspend fun getBridge(): List<Bridge> {
-        return arrayListOf()//Bridge("","","","")
+    override suspend fun getBridges(): List<Bridge> {
+        val uPnPDeviceSet = discoverDevices().toList()
+        val ipAddress = uPnPDeviceSet.filter { it.isPhillipsHueBridge() }[0].location
+        val uPnPService = Injector.injectRetrofitService(ipAddress, UPnPService::class.java)
+        val bridgeConfig = uPnPService.getBridgeConfig().await()
+
+        return arrayListOf(
+            bridgeConfig.convertToBridge(ipAddress)
+        )
+    }
+
+    suspend fun discoverDevices(): HashSet<UPnPDevice> {
+        val wifiManager: WifiManager? =
+            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+        return runBlocking(Dispatchers.IO) {
+            try {
+                withTimeout(timeOut) {
+                    wifiManager?.let {
+                        val multiCastLock = it.createMulticastLock(internetAddress)
+                        multiCastLock.acquire()
+                        var socket: DatagramSocket? = null
+
+                        try {
+                            val group =
+                                InetAddress.getByName(internetAddress)
+                            val port: Int = port
+                            val query: String = customQuery
+
+                            socket = DatagramSocket(null).apply {
+                                reuseAddress = true
+                                broadcast = true
+                            }
+                            socket.bind(InetSocketAddress(port))
+
+                            val datagramPacketRequest =
+                                DatagramPacket(query.toByteArray(), query.length, group, port)
+                            socket.send(datagramPacketRequest)
+
+                            val time = System.currentTimeMillis()
+                            var curTime = System.currentTimeMillis()
+
+                            while (curTime - time < 1000) {
+                                val datagramPacket =
+                                    DatagramPacket(ByteArray(1024), 1024)
+                                socket.receive(datagramPacket)
+                                val response =
+                                    String(datagramPacket.data, 0, datagramPacket.length)
+                                if (response.substring(0, 12).toUpperCase() == "HTTP/1.1 200") {
+                                    val device =
+                                        UPnPDevice(datagramPacket.address.hostAddress, response)
+                                    threadCount++
+                                    getData(device.location, device)
+                                }
+                                curTime = System.currentTimeMillis()
+                            }
+                        } catch (e: IOException) {
+                            throw e
+                        } finally {
+                            socket?.close()
+                        }
+                        multiCastLock.release()
+                    }
+                }
+            } catch (exception: Exception) {
+                throw exception
+            }
+            devices
+        }
     }
 
     fun discoverDevices(
@@ -86,7 +157,7 @@ class UPnPDiscoveryManager(
                                         val device =
                                             UPnPDevice(datagramPacket.address.hostAddress, response)
                                         threadCount++
-                                        getData(device.location, device, discoverListener)
+                                        getData(device.location, device)
                                     }
                                     curTime = System.currentTimeMillis()
                                 }
@@ -102,11 +173,11 @@ class UPnPDiscoveryManager(
                         }
                     }
                 } catch (exception: Exception) {
-                    launch(Dispatchers.Main){
+                    launch(Dispatchers.Main) {
                         discoverListener.onError(exception)
                     }
                 } finally {
-                    launch(Dispatchers.Main)  {
+                    launch(Dispatchers.Main) {
                         discoverListener.onFinish(devices)
                     }
                 }
@@ -116,33 +187,20 @@ class UPnPDiscoveryManager(
 
     private fun getData(
         url: String,
-        device: UPnPDevice,
-        uPnPListener: IDiscoveryManager.DiscoverListener
+        device: UPnPDevice
     ) {
         val stringRequest = StringRequest(
             Request.Method.GET, url,
             Response.Listener<String?> { response ->
                 CoroutineScope(Dispatchers.IO).launch {
                     device.update(response)
-                    launch(Dispatchers.Main) {
-                        uPnPListener.onFoundNewDevice(device)
-                    }
 
                     devices.add(device)
                     threadCount--
-                    if (threadCount == 0)
-                        launch(Dispatchers.Main) {
-                            uPnPListener.onFinish(devices)
-                        }
-
                 }
-
             }, Response.ErrorListener {
                 CoroutineScope(Dispatchers.IO).launch {
                     threadCount--
-                    launch(Dispatchers.Main) {
-                        uPnPListener.onError(it)
-                    }
                 }
             })
         Volley.newRequestQueue(context).add(stringRequest)

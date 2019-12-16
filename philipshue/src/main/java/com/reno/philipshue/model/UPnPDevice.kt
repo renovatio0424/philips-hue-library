@@ -12,7 +12,7 @@ const val USN_TEXT = "USN: "
 const val ST_TEXT = "ST: "
 const val lineEnd = "\r\n"
 
-data class UPnPDevice(// From SSDP Packet
+class UPnPDevice(// From SSDP Packet
     private val hostAddress: String, // SSDP Packet Header
     private val header: String
 ) {
@@ -33,7 +33,8 @@ data class UPnPDevice(// From SSDP Packet
         private set
     // From description XML
     private var deviceType: String? = null
-    private var friendlyName: String? = null
+    var friendlyName: String? = null
+        get() = field
     private var presentationURL: String? = null
     private var serialNumber: String? = null
     private var modelName: String? = null
@@ -47,6 +48,19 @@ data class UPnPDevice(// From SSDP Packet
     fun update(xml: String?) {
         descriptionXML = xml
         xmlParse(xml)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is UPnPDevice)
+            return false
+
+        return hostAddress == other.hostAddress &&
+                header == other.header &&
+                location == other.location &&
+                server == other.server &&
+                uSN == other.uSN &&
+                sT == other.sT &&
+                friendlyName == other.friendlyName
     }
 
     override fun toString(): String {
@@ -127,4 +141,8 @@ data class UPnPDevice(// From SSDP Packet
         internal val URLBase: String? = null
     )
 
+}
+
+fun UPnPDevice.isPhillipsHueBridge(): Boolean {
+    return this.friendlyName == "Phillips Hue"
 }

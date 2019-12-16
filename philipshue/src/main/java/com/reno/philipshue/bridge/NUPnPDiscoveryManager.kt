@@ -11,7 +11,7 @@ class NUPnPDiscoveryManager : IDiscoveryManager {
     private val nUPnPService: NUPnPService =
         Injector.injectRetrofitService(baseUrl, NUPnPService::class.java)
 
-    override suspend fun getBridge(): List<Bridge> {
+    override suspend fun getBridges(): List<Bridge> {
         return  nUPnPService.getBridgeAsync()
     }
 }
