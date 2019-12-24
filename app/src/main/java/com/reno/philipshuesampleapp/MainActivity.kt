@@ -8,9 +8,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.reno.philipshue.bridge.IDiscoveryManager
-import com.reno.philipshue.bridge.NUPnPDiscoveryManager
-import com.reno.philipshue.bridge.UPnPDiscoveryManager
+import com.reno.philipshue.bridge.local.IDiscoveryManager
+import com.reno.philipshue.bridge.local.NUPnPDiscoveryManager
+import com.reno.philipshue.bridge.local.UPnPDiscoveryManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,31 +39,6 @@ class MainActivity : AppCompatActivity() {
         mAdapter = MyAdapter(myDataSet)
         mRecyclerView.adapter = mAdapter
 
-//        val uPnPManager = UPnPDiscoveryManager.Builder(this).build()
-//        uPnPManager.discoverDevices(object: IDiscoveryManager.DiscoverListener {
-//            override fun onStart() {
-//                Log.d(TAG, "Start discovery")
-//            }
-//
-//            override fun onFoundNewDevice(device: UPnPDevice) {
-//                Log.d(TAG, "Found new device")
-//                Log.d("App", device.location)
-//                myDataSet.add(device.toString())
-//                (mAdapter as MyAdapter).notifyDataSetChanged()
-//            }
-//
-//            override fun onFinish(devices: HashSet<UPnPDevice>) {
-//                // To do something
-//                Log.d(TAG,"Discovery finished")
-//            }
-//
-//            override fun onError(exception: Exception) {
-//                Log.d(TAG, "Error: " + exception.localizedMessage)
-//                exception.printStackTrace()
-//            }
-//
-//        })
-
         val uPnPDiscoveryManager = UPnPDiscoveryManager.Builder(this).build()
         CoroutineScope(Dispatchers.IO).launch {
             val uPnPDevices = uPnPDiscoveryManager.discoverDevices().toList()
@@ -72,7 +47,8 @@ class MainActivity : AppCompatActivity() {
 
         myDataSet.add("END")
 
-        val discoverManager:IDiscoveryManager = NUPnPDiscoveryManager()
+        val discoverManager: IDiscoveryManager =
+            NUPnPDiscoveryManager()
         CoroutineScope(Dispatchers.IO).launch {
             val bridge = discoverManager.getBridges()
             launch(Dispatchers.Main) {
