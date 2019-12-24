@@ -1,5 +1,6 @@
 package com.reno.philipshue.di
 
+import android.app.Application
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Context
@@ -9,6 +10,7 @@ import com.reno.philipshue.bridge.*
 import com.reno.philipshue.network.BridgeService
 import com.reno.philipshue.network.NUPnPService
 import com.reno.philipshue.network.UPnPService
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -21,6 +23,7 @@ class PhilipsHueContentProvider : ContentProvider() {
         startKoin {
             printLogger()
             modules(hueModules)
+            androidContext(context as Application)
         }
         return true
     }
@@ -85,14 +88,18 @@ val networkModule = module {
 }
 
 val managerModule = module {
-    factory<IUPnPDiscoveryManager> { (context: Context) ->
-        UPnPDiscoveryManager
-            .Builder(context)
-            .build()
+    factory<IUPnPDiscoveryManager> {
+        UPnPDiscoveryManager(get())
     }
 
     factory<INUPnPDiscoveryManager> {
         NUPnPDiscoveryManager()
+    }
+
+    factory<ISocketDiscoveryManager> {
+        SocketDiscoveryManager
+            .Builder(androidContext())
+            .build()
     }
 }
 

@@ -1,6 +1,5 @@
 package com.reno.philipshue.bridge
 
-import android.content.Context
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.network.BridgeService
 import kotlinx.coroutines.CoroutineScope
@@ -12,16 +11,12 @@ import org.koin.java.KoinJavaComponent.inject
 
 const val BRIDGE_BASE_URL: String = ""
 
-class BridgeManager(private val context: Context) : IBridgeManager {
+class BridgeManager : IBridgeManager {
     private val bridgeService: BridgeService by inject(BridgeService::class.java) {
         parametersOf(BRIDGE_BASE_URL)
     }
     private val nUPnPDiscoveryManager: INUPnPDiscoveryManager by inject(INUPnPDiscoveryManager::class.java)
-    private val uPnPManager: IUPnPDiscoveryManager by inject(IUPnPDiscoveryManager::class.java) {
-        parametersOf(
-            context
-        )
-    }
+    private val uPnPManager: IUPnPDiscoveryManager by inject(IUPnPDiscoveryManager::class.java)
 
     override fun connectBridge(
         onSuccess: (List<Bridge>) -> Unit,
