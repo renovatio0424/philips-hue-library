@@ -6,13 +6,14 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.reno.philipshue.injector.Injector
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.model.UPnPDevice
 import com.reno.philipshue.model.convertToBridge
 import com.reno.philipshue.model.isPhillipsHueBridge
 import com.reno.philipshue.network.UPnPService
 import kotlinx.coroutines.*
+import org.koin.core.parameter.parametersOf
+import org.koin.java.KoinJavaComponent.inject
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -38,14 +39,16 @@ class UPnPDiscoveryManager(
     private val customQuery: String,
     private val internetAddress: String,
     private val port: Int
-) : IDiscoveryManager {
+) : IUPnPDiscoveryManager {
     private val devices = hashSetOf<UPnPDevice>()
     private var threadCount = 0
 
     override suspend fun getBridges(): List<Bridge> {
         val uPnPDeviceSet = discoverDevices().toList()
         val ipAddress = uPnPDeviceSet.filter { it.isPhillipsHueBridge() }[0].location
-        val uPnPService = Injector.injectRetrofitService(ipAddress, UPnPService::class.java)
+        val uPnPService:UPnPService by inject(UPnPService::class.java){
+            parametersOf(ipAddress)
+        }
         val bridgeConfig = uPnPService.getBridgeConfig().await()
 
         return arrayListOf(
@@ -57,7 +60,7 @@ class UPnPDiscoveryManager(
         val wifiManager: WifiManager? =
             context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        return runBlocking(Dispatchers.IO) {
+        return withContext(Dispatchers.IO) {
             try {
                 withTimeout(timeOut) {
                     wifiManager?.let {
@@ -220,3 +223,5 @@ class UPnPDiscoveryManager(
         fun build() = UPnPDiscoveryManager(context, timeOut, query, address, port)
     }
 }
+
+interface IUPnPDiscoveryManager : IDiscoveryManager

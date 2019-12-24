@@ -1,20 +1,27 @@
 package com.reno.philipshue.bridge
 
 import android.content.Context
-import com.reno.philipshue.injector.Injector
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.network.BridgeService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.core.parameter.parametersOf
+import org.koin.java.KoinJavaComponent.inject
 
 const val BRIDGE_BASE_URL: String = ""
 
 class BridgeManager(private val context: Context) : IBridgeManager {
-    private val bridgeService: BridgeService = Injector.injectBridgeService(BRIDGE_BASE_URL)
-    private val nUPnPDiscoveryManager: IDiscoveryManager = Injector.injectNUPnPManager()
-    private val uPnPManager: IDiscoveryManager = Injector.injectUPnPManager(context)
+    private val bridgeService: BridgeService by inject(BridgeService::class.java) {
+        parametersOf(BRIDGE_BASE_URL)
+    }
+    private val nUPnPDiscoveryManager: INUPnPDiscoveryManager by inject(INUPnPDiscoveryManager::class.java)
+    private val uPnPManager: IUPnPDiscoveryManager by inject(IUPnPDiscoveryManager::class.java) {
+        parametersOf(
+            context
+        )
+    }
 
     override fun connectBridge(
         onSuccess: (List<Bridge>) -> Unit,
