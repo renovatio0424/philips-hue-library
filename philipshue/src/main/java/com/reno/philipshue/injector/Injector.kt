@@ -1,9 +1,9 @@
 package com.reno.philipshue.injector
 
 import android.content.Context
-import com.reno.philipshue.bridge.IDiscoveryManager
-import com.reno.philipshue.bridge.NUPnPDiscoveryManager
-import com.reno.philipshue.bridge.UPnPDiscoveryManager
+import com.reno.philipshue.bridge.local.IDiscoveryManager
+import com.reno.philipshue.bridge.local.NUPnPDiscoveryManager
+import com.reno.philipshue.bridge.local.UPnPDiscoveryManager
 import com.reno.philipshue.network.BridgeService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -22,5 +22,6 @@ object Injector {
         UPnPDiscoveryManager.Builder(context)
             .build()
 
-    fun injectNUPnPManager(): IDiscoveryManager = NUPnPDiscoveryManager()
+    fun injectNUPnPManager(): IDiscoveryManager =
+        NUPnPDiscoveryManager()
 }

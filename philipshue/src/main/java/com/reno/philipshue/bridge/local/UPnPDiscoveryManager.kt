@@ -1,4 +1,4 @@
-package com.reno.philipshue.bridge
+package com.reno.philipshue.bridge.local
 
 import android.content.Context
 import android.net.wifi.WifiManager
@@ -217,6 +217,12 @@ class UPnPDiscoveryManager(
         fun query(query: String?) = apply { this.query }
         fun address(address: String?) = apply { this.address }
         fun port(port: Int?) = apply { this.port }
-        fun build() = UPnPDiscoveryManager(context, timeOut, query, address, port)
+        fun build() = UPnPDiscoveryManager(
+            context,
+            timeOut,
+            query,
+            address,
+            port
+        )
     }
 }
