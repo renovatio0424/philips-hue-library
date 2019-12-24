@@ -1,6 +1,7 @@
 package com.reno.philipshue.bridge
 
 import android.content.Context
+import com.reno.philipshue.bridge.local.IDiscoveryManager
 import com.reno.philipshue.injector.Injector
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.network.BridgeService
