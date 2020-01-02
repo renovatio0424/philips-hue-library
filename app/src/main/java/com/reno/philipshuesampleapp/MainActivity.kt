@@ -1,5 +1,6 @@
 package com.reno.philipshuesampleapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.reno.philipshue.bridge.local.IDiscoveryManager
 import com.reno.philipshue.bridge.local.NUPnPDiscoveryManager
 import com.reno.philipshue.bridge.local.UPnPDiscoveryManager
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
 const val TAG = "MainActivity"
+
 class MainActivity : AppCompatActivity() {
     private var mAdapter: RecyclerView.Adapter<*>? = null
     private val myDataSet = ArrayList<String>()
@@ -56,6 +59,10 @@ class MainActivity : AppCompatActivity() {
                     myDataSet.add(it.toString())
                 }
             }
+        }
+
+        login_button.setOnClickListener {
+            startActivity(Intent(this, HueLoginActivity::class.java))
         }
     }
 
