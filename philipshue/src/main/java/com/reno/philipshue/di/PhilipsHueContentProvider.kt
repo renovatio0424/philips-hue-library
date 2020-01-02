@@ -3,7 +3,6 @@ package com.reno.philipshue.di
 import android.app.Application
 import android.content.ContentProvider
 import android.content.ContentValues
-import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import com.reno.philipshue.bridge.*
@@ -78,7 +77,7 @@ val networkModule = module {
             .create(NUPnPService::class.java)
     }
 
-    factory<UPnPService> { (baseUrl:String)->
+    factory<UPnPService> { (baseUrl:String) ->
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
