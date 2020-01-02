@@ -1,43 +1,47 @@
 package com.reno.philipshue.bridge
 
-import android.content.Context
-import android.net.wifi.WifiManager
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+import android.util.Log
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.model.UPnPDevice
 import com.reno.philipshue.model.convertToBridge
 import com.reno.philipshue.model.isPhillipsHueBridge
 import com.reno.philipshue.network.UPnPService
-import kotlinx.coroutines.*
 import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent.inject
-import java.io.IOException
-import java.net.DatagramPacket
-import java.net.DatagramSocket
-import java.net.InetAddress
-import java.net.InetSocketAddress
+
+const val TAG = "UPnPDiscoveryManager"
 
 class UPnPDiscoveryManager(
-    private val socketDiscoveryManager: SocketDiscoveryManager
+    private val socketDiscoveryManager: ISocketDiscoveryManager
 ) : IUPnPDiscoveryManager {
 
     override suspend fun getBridges(): List<Bridge> {
-        val uPnPDeviceSet = discoverDevices().toList()
-        val ipAddress = uPnPDeviceSet.filter { it.isPhillipsHueBridge() }[0].location
-        val uPnPService:UPnPService by inject(UPnPService::class.java){
-            parametersOf(ipAddress)
-        }
-        val bridgeConfig = uPnPService.getBridgeConfig().await()
-
-        return arrayListOf(
-            bridgeConfig.convertToBridge(ipAddress)
-        )
+        val philipsDevices = discoverDevices().filter { it.isPhillipsHueBridge() }
+        return discoverBridges(philipsDevices)
     }
 
-    private suspend fun discoverDevices(): HashSet<UPnPDevice> {
+    private suspend fun discoverBridges(uPnPDevices: List<UPnPDevice>): List<Bridge> {
+        val bridges = arrayListOf<Bridge>()
+
+        if(uPnPDevices.isNullOrEmpty())
+            return bridges
+
+        uPnPDevices.forEach {
+            val ipAddress = it.location
+
+            val uPnPService by inject(UPnPService::class.java) {
+                parametersOf(ipAddress)
+            }
+            Log.d(TAG, "ipAddress: $ipAddress")
+
+            val bridgeConfig = uPnPService.getBridgeConfigAsync().await()
+            bridges.add(bridgeConfig.convertToBridge(ipAddress))
+        }
+
+        return bridges
+    }
+
+    private suspend fun discoverDevices(): List<UPnPDevice> {
         return socketDiscoveryManager.getDevices()
     }
 }

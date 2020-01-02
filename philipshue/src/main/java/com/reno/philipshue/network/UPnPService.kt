@@ -8,7 +8,7 @@ import retrofit2.http.Path
 interface UPnPService {
 
     @GET("/api/config")
-    fun getBridgeConfig(): Deferred<BridgeConfig>
+    fun getBridgeConfigAsync(): Deferred<BridgeConfig>
 
     @GET("/api/{userName}/config")
     fun getBridgeConfig(@Path("userName") userName: String): Deferred<BridgeConfig>
