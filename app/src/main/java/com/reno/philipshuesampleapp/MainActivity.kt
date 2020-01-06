@@ -1,6 +1,8 @@
 package com.reno.philipshuesampleapp
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,9 +10,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.reno.philipshue.bridge.IDiscoveryManager
-import com.reno.philipshue.bridge.NUPnPDiscoveryManager
-import com.reno.philipshue.bridge.UPnPDiscoveryManager
+import com.reno.philipshue.bridge.BridgeManager
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,17 +52,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         myDataSet.add("END")
-
-        val discoverManager: IDiscoveryManager =
-            NUPnPDiscoveryManager()
-        CoroutineScope(Dispatchers.IO).launch {
-            val bridge = discoverManager.getBridges()
-            launch(Dispatchers.Main) {
-                bridge.forEach {
-                    myDataSet.add(it.toString())
-                }
-            }
-        }
 
         login_button.setOnClickListener {
             startActivity(Intent(this, HueLoginActivity::class.java))

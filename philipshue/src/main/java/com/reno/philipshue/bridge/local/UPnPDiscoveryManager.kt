@@ -1,6 +1,7 @@
 package com.reno.philipshue.bridge
 
 import android.util.Log
+import com.reno.philipshue.bridge.local.IDiscoveryManager
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.model.UPnPDevice
 import com.reno.philipshue.model.convertToBridge

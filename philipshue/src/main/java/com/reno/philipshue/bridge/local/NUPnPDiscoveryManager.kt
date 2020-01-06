@@ -1,5 +1,6 @@
 package com.reno.philipshue.bridge
 
+import com.reno.philipshue.bridge.local.IDiscoveryManager
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.network.NUPnPService
 import org.koin.core.parameter.parametersOf
