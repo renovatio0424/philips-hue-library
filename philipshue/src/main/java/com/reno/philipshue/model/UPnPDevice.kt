@@ -3,7 +3,6 @@ package com.reno.philipshue.model
 import com.stanfy.gsonxml.GsonXml
 import com.stanfy.gsonxml.GsonXmlBuilder
 import com.stanfy.gsonxml.XmlParserCreator
-import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 
 const val LOCATION_TEXT = "LOCATION: "
@@ -121,6 +120,27 @@ class UPnPDevice(// From SSDP Packet
             uDN = it.UDN
         }
         uRLBase = model.URLBase
+    }
+
+    override fun hashCode(): Int {
+        var result = hostAddress.hashCode()
+        result = 31 * result + header.hashCode()
+        result = 31 * result + location.hashCode()
+        result = 31 * result + server.hashCode()
+        result = 31 * result + uSN.hashCode()
+        result = 31 * result + sT.hashCode()
+        result = 31 * result + (descriptionXML?.hashCode() ?: 0)
+        result = 31 * result + (deviceType?.hashCode() ?: 0)
+        result = 31 * result + (presentationURL?.hashCode() ?: 0)
+        result = 31 * result + (serialNumber?.hashCode() ?: 0)
+        result = 31 * result + (modelName?.hashCode() ?: 0)
+        result = 31 * result + (modelNumber?.hashCode() ?: 0)
+        result = 31 * result + (modelURL?.hashCode() ?: 0)
+        result = 31 * result + (manufacturer?.hashCode() ?: 0)
+        result = 31 * result + (manufacturerURL?.hashCode() ?: 0)
+        result = 31 * result + (uDN?.hashCode() ?: 0)
+        result = 31 * result + (uRLBase?.hashCode() ?: 0)
+        return result
     }
 
     data class Device(

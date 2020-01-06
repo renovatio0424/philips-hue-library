@@ -1,6 +1,5 @@
 package com.reno.philipshuesampleapp
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,10 +8,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.reno.philipshue.bridge.local.IDiscoveryManager
-import com.reno.philipshue.bridge.local.NUPnPDiscoveryManager
-import com.reno.philipshue.bridge.local.UPnPDiscoveryManager
-import kotlinx.android.synthetic.main.activity_main.*
+import com.reno.philipshue.bridge.IDiscoveryManager
+import com.reno.philipshue.bridge.NUPnPDiscoveryManager
+import com.reno.philipshue.bridge.UPnPDiscoveryManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,10 +40,14 @@ class MainActivity : AppCompatActivity() {
         mAdapter = MyAdapter(myDataSet)
         mRecyclerView.adapter = mAdapter
 
-        val uPnPDiscoveryManager = UPnPDiscoveryManager.Builder(this).build()
         CoroutineScope(Dispatchers.IO).launch {
-            val uPnPDevices = uPnPDiscoveryManager.discoverDevices().toList()
-            uPnPDevices.forEach { myDataSet.add(it.toString()) }
+            BridgeManager().connectBridge({ bridges ->
+                bridges.forEach { myDataSet.add(it.toString()) }
+            }, {
+                it.printStackTrace()
+            }, {
+                Log.d(TAG, "end")
+            })
         }
 
         myDataSet.add("END")
