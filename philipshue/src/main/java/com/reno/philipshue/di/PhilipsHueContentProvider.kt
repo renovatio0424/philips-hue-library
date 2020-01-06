@@ -3,12 +3,17 @@ package com.reno.philipshue.di
 import android.app.Application
 import android.content.ContentProvider
 import android.content.ContentValues
+import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.Uri
-import com.reno.philipshue.bridge.*
-import com.reno.philipshue.network.BridgeService
-import com.reno.philipshue.network.NUPnPService
-import com.reno.philipshue.network.UPnPService
+import androidx.preference.PreferenceManager
+import com.reno.philipshue.bridge.local.*
+import com.reno.philipshue.bridge.remote.IRemoteBridgeManager
+import com.reno.philipshue.bridge.remote.RemoteBridgeManager
+import com.reno.philipshue.bridge.remote.repository.token.ITokenRepository
+import com.reno.philipshue.bridge.remote.repository.token.TokenRepository
+import com.reno.philipshue.bridge.remote.repository.token.data_source.*
+import com.reno.philipshue.network.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
@@ -60,15 +65,6 @@ class PhilipsHueContentProvider : ContentProvider() {
 }
 
 val networkModule = module {
-    //bridgeService
-    factory<BridgeService> { (baseUrl: String) ->
-        Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(BridgeService::class.java)
-    }
-
     factory<NUPnPService> { (baseUrl: String) ->
         Retrofit.Builder()
             .baseUrl(baseUrl)
@@ -77,12 +73,20 @@ val networkModule = module {
             .create(NUPnPService::class.java)
     }
 
-    factory<UPnPService> { (baseUrl:String) ->
+    factory<UPnPService> { (baseUrl: String) ->
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(UPnPService::class.java)
+    }
+
+    factory<RemoteHueAuthService> {
+        Retrofit.Builder()
+            .baseUrl(AUTH_BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(RemoteHueAuthService::class.java)
     }
 }
 
@@ -100,10 +104,35 @@ val managerModule = module {
             .Builder(androidContext())
             .build()
     }
+
+    factory<ILocalBridgeManager> { LocalBridgeManager(get(), get()) }
+
+    factory<IRemoteBridgeManager> { RemoteBridgeManager(get()) }
+
+}
+
+val repositoryModule = module {
+    factory<ITokenRepository> {
+        TokenRepository(get(), get())
+    }
+
+    factory<IRemoteDataSource> {
+        RemoteDataSource(get())
+    }
+
+    factory<ILocalDataSource> {
+        LocalDataSource(get())
+    }
+
+    single<SharedPreferences> {
+        PreferenceManager.getDefaultSharedPreferences(androidContext())
+    }
+
 }
 
 val hueModules = listOf(
     networkModule,
-    managerModule
+    managerModule,
+    repositoryModule
 )
 

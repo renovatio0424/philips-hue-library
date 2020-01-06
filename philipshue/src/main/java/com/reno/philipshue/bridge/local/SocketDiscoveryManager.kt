@@ -1,4 +1,4 @@
-package com.reno.philipshue.bridge
+package com.reno.philipshue.bridge.local
 
 import android.content.Context
 import android.net.wifi.WifiManager
@@ -48,13 +48,19 @@ class SocketDiscoveryManager(
         fun query(query: String?) = apply { this.query }
         fun address(address: String?) = apply { this.address }
         fun port(port: Int?) = apply { this.port }
-        fun build() = SocketDiscoveryManager(context, timeOut, query, address, port)
+        fun build() = SocketDiscoveryManager(
+            context,
+            timeOut,
+            query,
+            address,
+            port
+        )
     }
 
     override suspend fun getDevices(): List<UPnPDevice> {
         return withContext(Dispatchers.IO) {
             try {
-                withTimeout(com.reno.philipshue.bridge.timeOut) {
+                withTimeout(com.reno.philipshue.bridge.local.timeOut) {
                     if (wifiManager == null)
                         return@withTimeout
 
