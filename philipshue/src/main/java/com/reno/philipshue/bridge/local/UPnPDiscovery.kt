@@ -11,7 +11,7 @@ import org.koin.java.KoinJavaComponent.inject
 
 const val TAG = "UPnPDiscoveryManager"
 
-class UPnPDiscoveryManager(
+class UPnPDiscovery(
     private val socketDiscoveryManager: ISocketDiscoveryManager
 ) : IUPnPDiscoveryManager {
 

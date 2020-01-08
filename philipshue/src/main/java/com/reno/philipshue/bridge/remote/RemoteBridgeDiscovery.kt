@@ -4,15 +4,15 @@ import com.reno.philipshue.bridge.remote.repository.token.TokenRepository
 import com.reno.philipshue.model.Bridge
 import kotlinx.coroutines.Deferred
 
-class RemoteBridgeManager(
+class RemoteBridgeDiscovery(
     private val tokenRepository: TokenRepository
-) : IRemoteBridgeManager {
+) : IRemoteBridgeDiscovery {
     override suspend fun getBridgeAsync(): Deferred<Bridge> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }
 
-interface IRemoteBridgeManager {
+interface IRemoteBridgeDiscovery {
     suspend fun getBridgeAsync(): Deferred<Bridge>
 }

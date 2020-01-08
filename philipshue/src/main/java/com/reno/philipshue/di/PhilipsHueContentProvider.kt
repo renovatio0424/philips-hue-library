@@ -8,8 +8,8 @@ import android.database.Cursor
 import android.net.Uri
 import androidx.preference.PreferenceManager
 import com.reno.philipshue.bridge.local.*
-import com.reno.philipshue.bridge.remote.IRemoteBridgeManager
-import com.reno.philipshue.bridge.remote.RemoteBridgeManager
+import com.reno.philipshue.bridge.remote.IRemoteBridgeDiscovery
+import com.reno.philipshue.bridge.remote.RemoteBridgeDiscovery
 import com.reno.philipshue.bridge.remote.repository.token.ITokenRepository
 import com.reno.philipshue.bridge.remote.repository.token.TokenRepository
 import com.reno.philipshue.bridge.remote.repository.token.data_source.*
@@ -92,11 +92,11 @@ val networkModule = module {
 
 val managerModule = module {
     factory<IUPnPDiscoveryManager> {
-        UPnPDiscoveryManager(get())
+        UPnPDiscovery(get())
     }
 
     factory<INUPnPDiscoveryManager> {
-        NUPnPDiscoveryManager()
+        NUPnPDiscovery()
     }
 
     factory<ISocketDiscoveryManager> {
@@ -105,9 +105,9 @@ val managerModule = module {
             .build()
     }
 
-    factory<ILocalBridgeManager> { LocalBridgeManager(get(), get()) }
+    factory<ILocalBridgeDiscovery> { LocalBridgeDiscovery(get(), get()) }
 
-    factory<IRemoteBridgeManager> { RemoteBridgeManager(get()) }
+    factory<IRemoteBridgeDiscovery> { RemoteBridgeDiscovery(get()) }
 
 }
 

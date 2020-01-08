@@ -7,7 +7,7 @@ import org.koin.java.KoinJavaComponent.inject
 
 const val timeOut: Long = 1000L
 
-class NUPnPDiscoveryManager : INUPnPDiscoveryManager {
+class NUPnPDiscovery : INUPnPDiscoveryManager {
     private val baseUrl: String = "https://discovery.meethue.com/"
     private val nUPnPService: NUPnPService by inject(NUPnPService::class.java) {
         parametersOf(

@@ -1,13 +1,12 @@
 package com.reno.philipshue.bridge
 
-import com.reno.philipshue.bridge.local.ILocalBridgeManager
-import com.reno.philipshue.bridge.remote.IRemoteBridgeManager
+import com.reno.philipshue.bridge.local.ILocalBridgeDiscovery
+import com.reno.philipshue.bridge.remote.IRemoteBridgeDiscovery
 import com.reno.philipshue.model.Bridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent.inject
 
 /**
@@ -18,17 +17,17 @@ import org.koin.java.KoinJavaComponent.inject
  * -------------------------------------------------------------------------------
  *                               BridgeManager
  * -------------------------------------------------------------------------------
- *               LocalBridgeManager               |        RemoteBridgeManager
+ *               LocalBridgeDiscovery      |        RemoteBridgeDiscovery
  * -------------------------------------------------------------------------------
- *  UPnPDiscoveryManager  |                       |         TokenRepository
- *  ----------------------| NUPnPDiscoveryManager |
- * SocketDiscoveryManager |                       |
+ *  UPnPDiscovery  |                       |         TokenRepository
+ *  ---------------| NUPnPDiscoveryManager |
+ * SocketDiscovery |                       |
  *
  * */
 
 class BridgeManager : IBridgeManager {
-    private val localBridgeManager: ILocalBridgeManager by inject(ILocalBridgeManager::class.java)
-    private val remoteBridgeManager: IRemoteBridgeManager by inject(IRemoteBridgeManager::class.java)
+    private val localBridgeDiscovery: ILocalBridgeDiscovery by inject(ILocalBridgeDiscovery::class.java)
+    private val remoteBridgeDiscovery: IRemoteBridgeDiscovery by inject(IRemoteBridgeDiscovery::class.java)
 
     override fun connectBridge(
         onSuccess: (List<Bridge>) -> Unit,
@@ -38,7 +37,7 @@ class BridgeManager : IBridgeManager {
         CoroutineScope(Dispatchers.Main).launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val bridges = localBridgeManager.getBridgeAsync()
+                    val bridges = localBridgeDiscovery.getBridgeAsync()
                     onSuccess(bridges)
                 } catch (e: Exception) {
                     onError(e)
