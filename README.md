@@ -9,7 +9,7 @@ Feature
 
 Requirement
 ======
-you should add this properties to application manifests
+1. you should add this properties to application manifests
 
 ```xml
 //manifests
