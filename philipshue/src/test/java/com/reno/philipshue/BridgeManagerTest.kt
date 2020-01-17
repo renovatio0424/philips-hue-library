@@ -1,7 +1,6 @@
 package com.reno.philipshue
 
 import com.reno.philipshue.model.Bridge
-import com.reno.philipshue.network.BridgeService
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.GlobalScope
@@ -11,8 +10,8 @@ import org.junit.Before
 import org.junit.Test
 
 class BridgeManagerTest {
-    @MockK
-    private lateinit var bridgeService: BridgeService
+//    @MockK
+//    private lateinit var bridgeService: BridgeService
 
     @Before
     fun setUp() {
@@ -35,7 +34,7 @@ class BridgeManagerTest {
             )
 
         GlobalScope.async {
-            bridgeService.useUPnP()
+//            bridgeService.useUPnP()
         }
         //retrofit mock
 

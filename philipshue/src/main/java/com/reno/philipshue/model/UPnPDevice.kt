@@ -44,7 +44,7 @@ class UPnPDevice(// From SSDP Packet
     private var uDN: String? = null
     private var uRLBase: String? = null
 
-    fun update(xml: String?) {
+    fun initDetailInfo(xml: String?) {
         descriptionXML = xml
         xmlParse(xml)
     }

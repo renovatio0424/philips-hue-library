@@ -1,4 +1,4 @@
-package com.reno.philipshue.bridge
+package com.reno.philipshue.bridge.local
 
 import android.util.Log
 import com.reno.philipshue.model.Bridge
@@ -11,7 +11,7 @@ import org.koin.java.KoinJavaComponent.inject
 
 const val TAG = "UPnPDiscoveryManager"
 
-class UPnPDiscoveryManager(
+class UPnPDiscovery(
     private val socketDiscoveryManager: ISocketDiscoveryManager
 ) : IUPnPDiscoveryManager {
 
@@ -32,6 +32,7 @@ class UPnPDiscoveryManager(
             val uPnPService by inject(UPnPService::class.java) {
                 parametersOf(ipAddress)
             }
+
             Log.d(TAG, "ipAddress: $ipAddress")
 
             val bridgeConfig = uPnPService.getBridgeConfigAsync().await()

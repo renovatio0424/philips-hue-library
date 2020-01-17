@@ -1,4 +1,4 @@
-package com.reno.philipshue.bridge
+package com.reno.philipshue.bridge.local
 
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.model.UPnPDevice

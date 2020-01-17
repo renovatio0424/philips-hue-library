@@ -17,6 +17,12 @@ you should add this properties to application manifests
     android:usesCleartextTraffic="true"/>
 ```
 
+2. if you want to use remote hue api, you should set this property in Android WebView
+
+```kotlin
+// HueLoginActivity.kt
+hue_login_web_view.settings.userAgentString = System.getProperty("http.agent")
+```
 License
 =======
 

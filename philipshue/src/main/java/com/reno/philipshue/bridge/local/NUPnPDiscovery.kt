@@ -1,4 +1,4 @@
-package com.reno.philipshue.bridge
+package com.reno.philipshue.bridge.local
 
 import com.reno.philipshue.model.Bridge
 import com.reno.philipshue.network.NUPnPService
@@ -7,7 +7,7 @@ import org.koin.java.KoinJavaComponent.inject
 
 const val timeOut: Long = 1000L
 
-class NUPnPDiscoveryManager : INUPnPDiscoveryManager {
+class NUPnPDiscovery : INUPnPDiscoveryManager {
     private val baseUrl: String = "https://discovery.meethue.com/"
     private val nUPnPService: NUPnPService by inject(NUPnPService::class.java) {
         parametersOf(
