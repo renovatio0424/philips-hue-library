@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.java.KoinJavaComponent.inject
+import kotlin.coroutines.CoroutineContext
 
 /**
  *
@@ -34,7 +35,7 @@ class BridgeManager : IBridgeManager {
         onError: (Exception) -> Unit,
         onComplete: () -> Unit
     ) {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             withContext(Dispatchers.IO) {
                 try {
                     val bridges = localBridgeDiscovery.getBridgeAsync()
@@ -47,6 +48,8 @@ class BridgeManager : IBridgeManager {
             }
         }
     }
+
+
 
 }
 

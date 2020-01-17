@@ -13,6 +13,8 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.net.InetSocketAddress
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resumeWithException
 
 const val DEFAULT_TIME_OUT = 5000L
 const val LINE_END = "\r\n"
@@ -33,10 +35,15 @@ class SocketDiscoveryManager(
     private val customQuery: String,
     private val internetAddress: String,
     private val port: Int
-) : ISocketDiscoveryManager {
+) : ISocketDiscoveryManager, CoroutineScope {
     private var threadCount = 0
-    private val devices = hashSetOf<UPnPDevice>()
-    private val wifiManager:WifiManager? by lazy { context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager }
+//    private val devices = hashSetOf<UPnPDevice>()
+    private val wifiManager: WifiManager? by lazy {
+        context.applicationContext.getSystemService(
+            Context.WIFI_SERVICE
+        ) as WifiManager
+    }
+
     data class Builder(
         var context: Context,
         var timeOut: Long = DEFAULT_TIME_OUT,
@@ -57,10 +64,14 @@ class SocketDiscoveryManager(
         )
     }
 
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO
+
     override suspend fun getDevices(): List<UPnPDevice> {
-        return withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.Default) {
+            val devices = ArrayList<UPnPDevice>()
             try {
-                withTimeout(com.reno.philipshue.bridge.local.timeOut) {
+                withTimeout(DEFAULT_TIME_OUT) {
                     if (wifiManager == null)
                         return@withTimeout
 
@@ -95,10 +106,8 @@ class SocketDiscoveryManager(
                             val response =
                                 String(datagramPacket.data, 0, datagramPacket.length)
                             if (response.substring(0, 12).toUpperCase() == "HTTP/1.1 200") {
-                                val device =
-                                    UPnPDevice(datagramPacket.address.hostAddress, response)
-                                threadCount++
-                                updateDeviceSet(device.location, device)
+                                val device = getDetailInfo(datagramPacket.address.hostAddress, response)
+                                devices.add(device)
                             }
                             curTime = System.currentTimeMillis()
                         }
@@ -112,8 +121,48 @@ class SocketDiscoveryManager(
             } catch (exception: Exception) {
                 throw exception
             }
-            devices.toList()
+            devices
         }
+    }
+
+    private suspend fun getDetailInfo(
+        url: String,
+        response: String
+    ) = suspendCancellableCoroutine<UPnPDevice> { cc ->
+        val stringRequest = StringRequest(
+            Request.Method.GET,
+            url,
+            Response.Listener<String?> {
+                val device = UPnPDevice(url, response).apply {
+                    initDetailInfo(it)
+                }
+                cc.resumeWith(kotlin.runCatching { device })
+            },
+            Response.ErrorListener {
+                cc.resumeWithException(it)
+            }
+        )
+
+        Volley.newRequestQueue(context).add(stringRequest)
+    }
+
+    private fun updateDevice(
+        url: String,
+        device: UPnPDevice
+    ) = launch {
+        val stringRequest = StringRequest(
+            Request.Method.GET,
+            url,
+            Response.Listener<String?> {
+                device.initDetailInfo(it)
+                threadCount--
+            },
+            Response.ErrorListener {
+                threadCount--
+            }
+        )
+
+        Volley.newRequestQueue(context).add(stringRequest)
     }
 
     private fun updateDeviceSet(
@@ -124,9 +173,7 @@ class SocketDiscoveryManager(
             Request.Method.GET, url,
             Response.Listener<String?> { response ->
                 CoroutineScope(Dispatchers.IO).launch {
-                    device.update(response)
-
-                    devices.add(device)
+                    device.initDetailInfo(response)
                     threadCount--
                 }
             }, Response.ErrorListener {

@@ -32,6 +32,7 @@ class UPnPDiscovery(
             val uPnPService by inject(UPnPService::class.java) {
                 parametersOf(ipAddress)
             }
+
             Log.d(TAG, "ipAddress: $ipAddress")
 
             val bridgeConfig = uPnPService.getBridgeConfigAsync().await()
