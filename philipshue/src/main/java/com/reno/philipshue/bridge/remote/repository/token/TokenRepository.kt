@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import com.reno.philipshue.model.Token
 
 private const val PREF_TOKEN = "token"
+private const val PREF_KEY = "key"
 
 class TokenRepository(
     private val preferences: SharedPreferences,
@@ -14,15 +15,30 @@ class TokenRepository(
     ITokenRepository {
 
     override fun getToken(): Token? {
-        return preferences.getString(PREF_TOKEN, null)
-            ?.let {
-                gson.fromJson(it, Token::class.java)
-            }
+        return getValue(PREF_TOKEN, Token::class.java)
     }
 
     override fun saveToken(token: Token) {
+        setValueAsync(PREF_TOKEN, token)
+    }
+
+    override fun getKey(): String? {
+        return getValue(PREF_KEY, String::class.java)
+    }
+
+    override fun saveKey(key: String) {
+        setValueAsync(key, String::class.java)
+    }
+
+    private fun <T> getValue(key: String, clazz: Class<T>): T? {
+        return preferences.getString(key, null)?.let {
+            gson.fromJson(it, clazz)
+        }
+    }
+
+    private fun <T> setValueAsync(key: String, value: T) {
         preferences.edit {
-            putString(PREF_TOKEN, gson.toJson(token))
+            putString(key, gson.toJson(value))
         }
     }
 }
@@ -30,4 +46,6 @@ class TokenRepository(
 interface ITokenRepository {
     fun getToken(): Token?
     fun saveToken(token: Token)
+    fun getKey(): String?
+    fun saveKey(key: String)
 }

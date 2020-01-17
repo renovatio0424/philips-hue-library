@@ -25,9 +25,11 @@ class HueWebViewClient(private val doAfterCallback: () -> Unit) : WebViewClient(
         if (request != null && isValidCallbackUrl(request.url)) {
             val code = request.url.getQueryParameter("code")
             val state = request.url.getQueryParameter("state")
+            val key = request.url.getQueryParameter("key")
 
-            if (code != null && state != null){
+            if (code != null && state != null && key != null) {
                 tokenRepository.saveToken(Token(code, state))
+                tokenRepository.saveKey(key)
             }
 
             doAfterCallback.invoke()

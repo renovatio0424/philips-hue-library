@@ -1,5 +1,8 @@
 package com.reno.philipshue.bridge.remote
 
+/**
+ * https://developers.meethue.com/develop/hue-api/remote-authentication/
+ * */
 private const val clientId = "R2FiYNNFweGXQL3iaNSLGAC6oCP0ZoxI"
 private const val clientSecret = "fKwmbnPfMzi12ybv"
 private const val appId = "huesampleapp"
