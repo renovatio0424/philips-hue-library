@@ -7,13 +7,14 @@ import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.Uri
 import androidx.preference.PreferenceManager
+import com.google.gson.Gson
 import com.reno.philipshue.bridge.local.*
 import com.reno.philipshue.bridge.remote.IRemoteBridgeDiscovery
 import com.reno.philipshue.bridge.remote.RemoteBridgeDiscovery
 import com.reno.philipshue.bridge.remote.repository.token.ITokenRepository
 import com.reno.philipshue.bridge.remote.repository.token.TokenRepository
-import com.reno.philipshue.bridge.remote.repository.token.data_source.*
-import com.reno.philipshue.network.*
+import com.reno.philipshue.network.NUPnPService
+import com.reno.philipshue.network.UPnPService
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
@@ -81,13 +82,6 @@ val networkModule = module {
             .create(UPnPService::class.java)
     }
 
-    factory<RemoteHueAuthService> {
-        Retrofit.Builder()
-            .baseUrl(AUTH_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(RemoteHueAuthService::class.java)
-    }
 }
 
 val managerModule = module {
@@ -112,20 +106,16 @@ val managerModule = module {
 }
 
 val repositoryModule = module {
-    factory<ITokenRepository> {
+    single<ITokenRepository> {
         TokenRepository(get(), get())
-    }
-
-    factory<IRemoteDataSource> {
-        RemoteDataSource(get())
-    }
-
-    factory<ILocalDataSource> {
-        LocalDataSource(get())
     }
 
     single<SharedPreferences> {
         PreferenceManager.getDefaultSharedPreferences(androidContext())
+    }
+
+    factory {
+        Gson()
     }
 
 }

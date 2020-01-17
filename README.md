@@ -12,17 +12,22 @@ Requirement
 1. you should add this properties to application manifests
 
 ```xml
-//manifests
+<!--manifests-->
 <application
     android:usesCleartextTraffic="true"/>
 ```
 
-2. if you want to use remote hue api, you should set this property in Android WebView
+2. if you want to use remote hue api, you should set this at Android WebView
 
 ```kotlin
 // HueLoginActivity.kt
 hue_login_web_view.settings.userAgentString = System.getProperty("http.agent")
+hue_login_web_view.webViewClient = HueWebViewClient {
+            //something to do after philips hue login 
+            finish()
+        }
 ```
+
 License
 =======
 
