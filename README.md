@@ -12,7 +12,7 @@ private fun initBridgeList() {
 }
 ```
 
-### 2. get token for controlling philips hue bulbs ([BridgeControlActivity.kr line: 93](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
+### 2. get token for controlling philips hue bulbs ([BridgeControlActivity.kt line: 93](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
 ```kotlin
 private fun fetchLightList() {
     val bridgeIp = Bridge.internalIpAddress
@@ -32,20 +32,20 @@ private fun fetchLightList() {
 }
 
 ```
-### 3. get light list ([BridgeControlActivity.kr line: 100](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
+### 3. get light list ([BridgeControlActivity.kt line: 100](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
 ```kotlin
 CoroutineScope(Dispatchers.Main).launch {
     val lightList:List<Light> = lightController.getLights(token)
 }
 ```
-### 4. turn on the light ([BridgeControlActivity.kr line: 46](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
+### 4. turn on the light ([BridgeControlActivity.kt line: 46](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
 ```kotlin
 CoroutineScope(Dispatchers.Main).launch {
     //you can get light id from Light.kt
     lightController.turnOn(token, lightId, turnOn)
 }
 ```
-### 5. change hue & color of lights ([BridgeControlActivity.kr line: 64](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
+### 5. change hue & color of lights ([BridgeControlActivity.kt line: 64](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
 ```kotlin
 // use ColorInt
 CoroutineScope(Dispatchers.Main).launch {
