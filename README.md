@@ -87,7 +87,6 @@ CoroutineScope(Dispatchers.Main).launch {
 ```
 
 # License
-=======
 
     Copyright 2019 Reno.
 
