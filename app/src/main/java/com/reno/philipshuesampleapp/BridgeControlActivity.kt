@@ -62,17 +62,10 @@ class BridgeControlActivity : AppCompatActivity() {
                     }
                     .setPositiveButton("Choose") { _, _, _ ->
                         CoroutineScope(Dispatchers.Main).launch {
-                            val red = Color.red(selectColor)
-                            val green = Color.green(selectColor)
-                            val blue = Color.blue(selectColor)
-
-                            Log.d("color", "red: $red, green: $green, blue: $blue")
-                            lightController.changeRGBColor(
+                            lightController.changeColor(
                                 token!!,
                                 lightIdx,
-                                red = red,
-                                green = green,
-                                blue = blue
+                                selectColor
                             )
                         }
                     }
@@ -165,6 +158,7 @@ class BridgeControlActivity : AppCompatActivity() {
                 butLightPower.text = if (light.state.on) "Turn On" else "Turn Off"
             }
 
+            butLightColor.text = itemView.context.getString(R.string.select_color)
             butLightColor.setOnClickListener {
                 onClickColor?.invoke(light.id)
             }

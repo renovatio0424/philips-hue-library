@@ -23,7 +23,7 @@ interface IBridgeController {
         token: String,
         lightIdx: Int,
         @ColorInt
-        color: Int
+        colorInt: Int
     )
 
     suspend fun changeRGBColor(
@@ -113,21 +113,24 @@ class BridgeController(bridgeIp: String) : IBridgeController {
     }
 
     @SuppressLint("Range")
-    override suspend fun changeColor(token: String, lightIdx: Int, color: Int) {
+    override suspend fun changeColor(token: String, lightIdx: Int, @ColorInt colorInt: Int) {
         return changeRGBColor(
             token,
             lightIdx,
-            Color.red(color),
-            Color.green(color),
-            Color.blue(color)
+            Color.red(colorInt),
+            Color.green(colorInt),
+            Color.blue(colorInt)
         )
     }
 
     override suspend fun changeRGBColor(
         token: String,
         lightIdx: Int,
+        @IntRange(from = 0, to = 255)
         red: Int,
+        @IntRange(from = 0, to = 255)
         green: Int,
+        @IntRange(from = 0, to = 255)
         blue: Int
     ) {
         val hsv = FloatArray(3)
@@ -145,11 +148,15 @@ class BridgeController(bridgeIp: String) : IBridgeController {
         )
     }
 
+    @SuppressLint("Range")
     override suspend fun changeHSVColor(
         token: String,
         lightIdx: Int,
+        @IntRange(from = 0, to = 255)
         brightness: Int,
+        @IntRange(from = 0, to = 255)
         saturation: Int,
+        @IntRange(from = 0, to = 360)
         hue: Int
     ) {
         return bridgeControlApi.changeColor(
