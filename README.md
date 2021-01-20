@@ -1,5 +1,4 @@
 # PhillipsHue Android Library
-======
 
 ## How to use it
 
