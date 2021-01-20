@@ -1,8 +1,9 @@
 # PhillipsHue Android Library
-
-How to use it
 ======
-## 1. get bridge list in your network
+
+## How to use it
+
+### 1. get bridge list in your network
 ```kotlin
 private fun initBridgeList() {
     CoroutineScope(Dispatchers.Main).launch {
@@ -12,7 +13,7 @@ private fun initBridgeList() {
 }
 ```
 
-## 2. get token for controlling philips hue bulbs
+### 2. get token for controlling philips hue bulbs
 ```kotlin
 private fun fetchLightList() {
     val bridgeIp = Bridge.internalIpAddress
@@ -32,20 +33,20 @@ private fun fetchLightList() {
 }
 
 ```
-## 3. get light list 
+### 3. get light list 
 ```kotlin
 CoroutineScope(Dispatchers.Main).launch {
     val lightList:List<Light> = lightController.getLights(token)
 }
 ```
-## 4. turn on the light
+### 4. turn on the light
 ```kotlin
 CoroutineScope(Dispatchers.Main).launch {
     //you can get light id from Light.kt
     lightController.turnOn(token, lightId, turnOn)
 }
 ```
-## 5. change hue & color of lights
+### 5. change hue & color of lights
 ```kotlin
 // use ColorInt
 CoroutineScope(Dispatchers.Main).launch {
@@ -86,7 +87,7 @@ CoroutineScope(Dispatchers.Main).launch {
 
 ```
 
-License
+# License
 =======
 
     Copyright 2019 Reno.
