@@ -1,6 +1,5 @@
-package com.reno.philipshue.network
+package com.reno.philipshue.bridge
 
-import com.reno.philipshue.model.Bridge
 import retrofit2.http.GET
 
 interface NUPnPService {

@@ -1,8 +1,7 @@
 package com.reno.philipshue
 
-import com.reno.philipshue.model.Bridge
+import com.reno.philipshue.bridge.Bridge
 import io.mockk.MockKAnnotations
-import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import org.junit.After

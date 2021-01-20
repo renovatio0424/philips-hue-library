@@ -1,14 +1,14 @@
-package com.reno.philipshue.model
+package com.reno.philipshue.bridge
 
 import com.google.gson.annotations.SerializedName
 
 data class Bridge(
     @SerializedName("id")
-    private val id: String,
+    val id: String,
     @SerializedName("internalipaddress")
-    private val internalIpAddress: String,
+    val internalIpAddress: String,
     @SerializedName("macaddress")
-    private val macAddress: String?,
+    val macAddress: String?,
     @SerializedName("name")
-    private val name: String?
+    val name: String?
 )

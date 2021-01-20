@@ -1,70 +1,56 @@
 package com.reno.philipshuesampleapp
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.reno.philipshue.bridge.BridgeManager
-import kotlinx.android.synthetic.main.activity_main.*
+import com.reno.philipshue.bridge.Bridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-const val TAG = "MainActivity"
-
 class MainActivity : AppCompatActivity() {
-    private var mAdapter: RecyclerView.Adapter<*>? = null
-    private val myDataSet = ArrayList<String>()
+    private var bridgeAdapter: RecyclerView.Adapter<*>? = null
+    private val myDataSet = ArrayList<Bridge>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val mRecyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true)
-
-        // use a linear layout manager
-        val mLayoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
-        mRecyclerView.layoutManager = mLayoutManager
-
-        // specify an adapter (see also next example)
-        mAdapter = MyAdapter(myDataSet)
-        mRecyclerView.adapter = mAdapter
-
-        CoroutineScope(Dispatchers.IO).launch {
-            BridgeManager().connectBridge({ bridges ->
-                bridges.forEach { myDataSet.add(it.toString()) }
-            }, {
-                it.printStackTrace()
-            }, {
-                Log.d(TAG, "end")
-            })
+        findViewById<RecyclerView>(R.id.rvBridge).apply {
+            setHasFixedSize(true)
+            val mLayoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this@MainActivity)
+            layoutManager = mLayoutManager
+            bridgeAdapter = BridgeAdapter(this@MainActivity, myDataSet)
+            adapter = bridgeAdapter
         }
 
-        myDataSet.add("END")
+        initBridgeList()
+    }
 
-        login_button.setOnClickListener {
-            startActivity(Intent(this, HueLoginActivity::class.java))
+    private fun initBridgeList() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val bridgeList = BridgeManager().getBridgeList()
+            myDataSet.addAll(bridgeList)
+            bridgeAdapter?.notifyDataSetChanged()
         }
     }
 
-    private class MyAdapter internal constructor(private val dataSet: ArrayList<String>) :
-        RecyclerView.Adapter<MyAdapter.ViewHolder?>() {
+    private class BridgeAdapter(
+        private val activity: MainActivity,
+        private val dataSet: ArrayList<Bridge>
+    ) : RecyclerView.Adapter<BridgeAdapter.ViewHolder?>() {
 
-        internal inner class ViewHolder(view: View) :
+        inner class ViewHolder(view: View) :
             RecyclerView.ViewHolder(view) {
             val mTextView: TextView = view.findViewById(R.id.textView)
-
         }
 
         override fun onCreateViewHolder(
@@ -77,7 +63,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.mTextView.text = dataSet[position]
+            holder.mTextView.text = dataSet[position].toString()
+            holder.mTextView.setOnClickListener {
+                Toast.makeText(activity, "clicked!", Toast.LENGTH_SHORT).show()
+                BridgeControlActivity.createIntent(dataSet[position].internalIpAddress, activity)
+                    .let {
+                        activity.startActivity(it)
+                    }
+            }
         }
 
         override fun getItemCount(): Int {

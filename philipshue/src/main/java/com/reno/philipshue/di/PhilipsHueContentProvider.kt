@@ -3,18 +3,11 @@ package com.reno.philipshue.di
 import android.app.Application
 import android.content.ContentProvider
 import android.content.ContentValues
-import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.Uri
-import androidx.preference.PreferenceManager
-import com.google.gson.Gson
-import com.reno.philipshue.bridge.local.*
-import com.reno.philipshue.bridge.remote.IRemoteBridgeDiscovery
-import com.reno.philipshue.bridge.remote.RemoteBridgeDiscovery
-import com.reno.philipshue.bridge.remote.repository.token.ITokenRepository
-import com.reno.philipshue.bridge.remote.repository.token.TokenRepository
-import com.reno.philipshue.network.NUPnPService
-import com.reno.philipshue.network.UPnPService
+import com.reno.philipshue.bridge.NUPnPDiscovery
+import com.reno.philipshue.bridgecontrol.BridgeControlApi
+import com.reno.philipshue.bridge.NUPnPService
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
@@ -74,55 +67,30 @@ val networkModule = module {
             .create(NUPnPService::class.java)
     }
 
-    factory<UPnPService> { (baseUrl: String) ->
+    factory<BridgeControlApi> { (bridgeIp: String) ->
+        val baseUrl = if (!bridgeIp.contains("http") && !bridgeIp.contains("https")) {
+            "http://$bridgeIp/"
+        } else {
+            bridgeIp
+        }
+
         Retrofit.Builder()
             .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(UPnPService::class.java)
+            .create(BridgeControlApi::class.java)
     }
-
 }
 
-val managerModule = module {
-    factory<IUPnPDiscoveryManager> {
-        UPnPDiscovery(get())
-    }
-
-    factory<INUPnPDiscoveryManager> {
+val discoveryModule = module {
+    factory {
         NUPnPDiscovery()
     }
-
-    factory<ISocketDiscoveryManager> {
-        SocketDiscoveryManager
-            .Builder(androidContext())
-            .build()
-    }
-
-    factory<ILocalBridgeDiscovery> { LocalBridgeDiscovery(get(), get()) }
-
-    factory<IRemoteBridgeDiscovery> { RemoteBridgeDiscovery(get()) }
-
-}
-
-val repositoryModule = module {
-    single<ITokenRepository> {
-        TokenRepository(get(), get())
-    }
-
-    single<SharedPreferences> {
-        PreferenceManager.getDefaultSharedPreferences(androidContext())
-    }
-
-    factory {
-        Gson()
-    }
-
 }
 
 val hueModules = listOf(
     networkModule,
-    managerModule,
-    repositoryModule
+    discoveryModule,
+
 )
 

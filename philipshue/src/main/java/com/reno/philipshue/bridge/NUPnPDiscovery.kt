@@ -1,13 +1,11 @@
-package com.reno.philipshue.bridge.local
+package com.reno.philipshue.bridge
 
-import com.reno.philipshue.model.Bridge
-import com.reno.philipshue.network.NUPnPService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.koin.core.parameter.parametersOf
 import org.koin.java.KoinJavaComponent.inject
 
-const val timeOut: Long = 1000L
-
-class NUPnPDiscovery : INUPnPDiscoveryManager {
+class NUPnPDiscovery : IBridgeDiscovery {
     private val baseUrl: String = "https://discovery.meethue.com/"
     private val nUPnPService: NUPnPService by inject(NUPnPService::class.java) {
         parametersOf(
@@ -16,8 +14,8 @@ class NUPnPDiscovery : INUPnPDiscoveryManager {
     }
 
     override suspend fun getBridges(): List<Bridge> {
-        return nUPnPService.getBridgeAsync()
+        return withContext(Dispatchers.IO) {
+            nUPnPService.getBridgeAsync()
+        }
     }
 }
-
-interface INUPnPDiscoveryManager: IDiscoveryManager
