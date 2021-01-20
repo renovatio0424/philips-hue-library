@@ -1,35 +1,92 @@
 # PhillipsHue Android Library
 
-Feature
-======
-1. connect bridge
-2. get list of lights 
-3. turn on or off the lights
-4. change hue & color of lights
+## How to use it
 
-Requirement
-======
-1. you should add this properties to application manifests
-
-```xml
-<!--manifests-->
-<application
-    android:usesCleartextTraffic="true"/>
-```
-
-2. if you want to use remote hue api, you should set this at Android WebView
-
+### 1. get bridge list in your network ([MainActivity.kt line: 38](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/MainActivity.kt))
 ```kotlin
-// HueLoginActivity.kt
-hue_login_web_view.settings.userAgentString = System.getProperty("http.agent")
-hue_login_web_view.webViewClient = HueWebViewClient {
-            //something to do after philips hue login 
-            finish()
-        }
+private fun initBridgeList() {
+    CoroutineScope(Dispatchers.Main).launch {
+        // you can get bridge list in your network
+        val bridgeList = BridgeManager().getBridgeList()
+    }
+}
 ```
 
-License
-=======
+### 2. get token for controlling philips hue bulbs ([BridgeControlActivity.kt line: 93](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
+```kotlin
+private fun fetchLightList() {
+    val bridgeIp = Bridge.internalIpAddress
+    val lightController = BridgeController(bridgeIp)
+    
+    CoroutineScope(Dispatchers.Main).launch {
+        try {
+            // if you click the link button, you can get a token!
+            token: String = lightController.getToken()
+            ...
+        } catch (exception: Exception) {
+            // it will throw UnClickBridgeLinkButtonException
+            // if you have not clicked the bridge link button
+            // so if the exception is thrown, you should deliver the message like "click the bridge button"
+        }
+    }
+}
+
+```
+### 3. get light list ([BridgeControlActivity.kt line: 100](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
+```kotlin
+CoroutineScope(Dispatchers.Main).launch {
+    val lightList:List<Light> = lightController.getLights(token)
+}
+```
+### 4. turn on the light ([BridgeControlActivity.kt line: 46](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
+```kotlin
+CoroutineScope(Dispatchers.Main).launch {
+    //you can get light id from Light.kt
+    lightController.turnOn(token, lightId, turnOn)
+}
+```
+### 5. change hue & color of lights ([BridgeControlActivity.kt line: 64](https://github.com/renovatio0424/PhilipsHueSampleApp/blob/master/app/src/main/java/com/reno/philipshuesampleapp/BridgeControlActivity.kt))
+```kotlin
+// use ColorInt
+CoroutineScope(Dispatchers.Main).launch {
+    lightController.changeColor(
+        token,
+        lightId,
+        //ColorInt
+        selectColor
+    )
+}
+// use RGB
+CoroutineScope(Dispatchers.Main).launch {
+    lightController.changeRGBColor(
+        token,
+        lightId,
+        red = Color.red(colorInt)
+        green = Color.green(colorInt)
+        blue = Color.blue(colorInt)
+    )
+}
+// use HSV
+CoroutineScope(Dispatchers.Main).launch {
+    val hsv = FloatArray(3)
+    
+    Color.colorToHSV(Color.rgb(red, green, blue), hsv)
+    val brightness = (hsv[2] * 255).toInt()
+    val saturation = (hsv[1] * 255).toInt()
+    val hue = ((hsv[0] * 65535) / 360).toInt()
+    
+    lightController.changeHSVColor(
+        token,
+        lightId,
+        hue = hue,
+        saturation = saturation,
+        brightness = brightness
+    )
+}
+
+```
+
+# License
 
     Copyright 2019 Reno.
 
