@@ -36,20 +36,20 @@ interface BridgeControlApi {
     @GET("/api/{token}/lights")
     suspend fun getLightList(@Path("token") token: String): Map<String, Light>
 
-    @GET("/api/{token}/lights/{lightIdx}")
-    suspend fun getLight(@Path("token") token: String, @Path("lightIdx") lightIdx: Int): Light
+    @GET("/api/{token}/lights/{lightId}")
+    suspend fun getLight(@Path("token") token: String, @Path("lightId") lightId: Int): Light
 
-    @PUT("/api/{token}/lights/{lightIdx}/state")
+    @PUT("/api/{token}/lights/{lightId}/state")
     suspend fun turnOn(
         @Path("token") token: String,
-        @Path("lightIdx") lightIdx: Int,
+        @Path("lightId") lightId: Int,
         @Body bridgeLightRequestBody: BridgeLightRequestBody
     )
 
-    @PUT("/api/{token}/lights/{lightIdx}/state")
+    @PUT("/api/{token}/lights/{lightId}/state")
     suspend fun changeColor(
         @Path("token") token: String,
-        @Path("lightIdx") lightIdx: Int,
+        @Path("lightId") lightId: Int,
         @Body bridgeLightRequestBody: BridgeLightRequestBody
     )
 }

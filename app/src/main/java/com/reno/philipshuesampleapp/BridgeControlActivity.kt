@@ -41,14 +41,14 @@ class BridgeControlActivity : AppCompatActivity() {
 
         rvLight.layoutManager = LinearLayoutManager(this)
         rvLight.adapter = ControlAdapter().apply {
-            onClickPower = { lightIdx, turnOn ->
+            onClickPower = { lightId, turnOn ->
                 token ?: showToast("no token")
                 CoroutineScope(Dispatchers.Main).launch {
-                    lightController.turnOn(token!!, lightIdx, turnOn)
+                    lightController.turnOn(token!!, lightId, turnOn)
                 }
             }
 
-            onClickColor = { lightIdx ->
+            onClickColor = { lightId ->
                 token ?: showToast("no token")
 
                 var selectColor = Color.WHITE
@@ -64,7 +64,7 @@ class BridgeControlActivity : AppCompatActivity() {
                         CoroutineScope(Dispatchers.Main).launch {
                             lightController.changeColor(
                                 token!!,
-                                lightIdx,
+                                lightId,
                                 selectColor
                             )
                         }
@@ -116,8 +116,8 @@ class BridgeControlActivity : AppCompatActivity() {
 
     class ControlAdapter : RecyclerView.Adapter<ControlViewHolder>() {
         private var lightList = ArrayList<Light>()
-        var onClickPower: ((lightIdx: Int, turnOn: Boolean) -> Unit)? = null
-        var onClickColor: ((lightIdx: Int) -> Unit)? = null
+        var onClickPower: ((lightId: Int, turnOn: Boolean) -> Unit)? = null
+        var onClickColor: ((lightId: Int) -> Unit)? = null
 
         fun addAll(lightList: List<Light>) {
             this.lightList.addAll(lightList)
@@ -147,8 +147,8 @@ class BridgeControlActivity : AppCompatActivity() {
 
         fun onBind(
             light: Light,
-            onClickPower: ((lightIdx: Int, turnOn: Boolean) -> Unit)?,
-            onClickColor: ((lightIdx: Int) -> Unit)?
+            onClickPower: ((lightId: Int, turnOn: Boolean) -> Unit)?,
+            onClickColor: ((lightId: Int) -> Unit)?
         ) {
             tvLightName.text = light.name
             butLightPower.text = if (light.state.on) "Turn On" else "Turn Off"

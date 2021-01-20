@@ -17,18 +17,18 @@ interface IBridgeController {
     suspend fun getToken(userName: String): String
     suspend fun getToken(): String
     suspend fun getLights(token: String): List<Light>
-    suspend fun getLight(token: String, lightIdx: Int): Light
-    suspend fun turnOn(token: String, lightIdx: Int, isOn: Boolean)
+    suspend fun getLight(token: String, lightId: Int): Light
+    suspend fun turnOn(token: String, lightId: Int, isOn: Boolean)
     suspend fun changeColor(
         token: String,
-        lightIdx: Int,
+        lightId: Int,
         @ColorInt
         colorInt: Int
     )
 
     suspend fun changeRGBColor(
         token: String,
-        lightIdx: Int,
+        lightId: Int,
         @IntRange(from = 0, to = 254)
         red: Int,
         @IntRange(from = 0, to = 254)
@@ -39,7 +39,7 @@ interface IBridgeController {
 
     suspend fun changeHSVColor(
         token: String,
-        lightIdx: Int,
+        lightId: Int,
         @IntRange(from = 0, to = 254)
         brightness: Int,
         @IntRange(from = 0, to = 254)
@@ -57,7 +57,7 @@ class BridgeController(bridgeIp: String) : IBridgeController {
         )
     }
 
-    @Throws(UnClickBridgeLinkButton::class, UnknownBridgeException::class)
+    @Throws(UnClickBridgeLinkButtonException::class, UnknownBridgeException::class)
     override suspend fun getToken(userName: String): String {
         return withContext(Dispatchers.Default) {
             val response = bridgeControlApi.getToken(BridgeTokenRequestBody(userName))
@@ -66,7 +66,7 @@ class BridgeController(bridgeIp: String) : IBridgeController {
         }
     }
 
-    @Throws(UnClickBridgeLinkButton::class, UnknownBridgeException::class)
+    @Throws(UnClickBridgeLinkButtonException::class, UnknownBridgeException::class)
     override suspend fun getToken(): String {
         return withContext(Dispatchers.Default) {
             val response =
@@ -84,7 +84,7 @@ class BridgeController(bridgeIp: String) : IBridgeController {
             jsonObject.asJsonObject.has("error") -> {
                 val type = jsonObject.asJsonObject["error"].asJsonObject["type"].asInt
                 if (type == 101) {
-                    throw UnClickBridgeLinkButton()
+                    throw UnClickBridgeLinkButtonException()
                 } else {
                     val description =
                         jsonObject.asJsonObject["error"].asJsonObject["description"].asString
@@ -104,19 +104,19 @@ class BridgeController(bridgeIp: String) : IBridgeController {
         }
     }
 
-    override suspend fun getLight(token: String, lightIdx: Int): Light {
-        return bridgeControlApi.getLight(token, lightIdx)
+    override suspend fun getLight(token: String, lightId: Int): Light {
+        return bridgeControlApi.getLight(token, lightId)
     }
 
-    override suspend fun turnOn(token: String, lightIdx: Int, isOn: Boolean) {
-        return bridgeControlApi.turnOn(token, lightIdx, BridgeLightRequestBody(on = isOn))
+    override suspend fun turnOn(token: String, lightId: Int, isOn: Boolean) {
+        return bridgeControlApi.turnOn(token, lightId, BridgeLightRequestBody(on = isOn))
     }
 
     @SuppressLint("Range")
-    override suspend fun changeColor(token: String, lightIdx: Int, @ColorInt colorInt: Int) {
+    override suspend fun changeColor(token: String, lightId: Int, @ColorInt colorInt: Int) {
         return changeRGBColor(
             token,
-            lightIdx,
+            lightId,
             Color.red(colorInt),
             Color.green(colorInt),
             Color.blue(colorInt)
@@ -125,7 +125,7 @@ class BridgeController(bridgeIp: String) : IBridgeController {
 
     override suspend fun changeRGBColor(
         token: String,
-        lightIdx: Int,
+        lightId: Int,
         @IntRange(from = 0, to = 255)
         red: Int,
         @IntRange(from = 0, to = 255)
@@ -141,7 +141,7 @@ class BridgeController(bridgeIp: String) : IBridgeController {
         Log.d("color", "brightness: $brightness, saturation: $saturation, hue: $hue")
         return changeHSVColor(
             token,
-            lightIdx,
+            lightId,
             brightness,
             saturation,
             hue
@@ -151,7 +151,7 @@ class BridgeController(bridgeIp: String) : IBridgeController {
     @SuppressLint("Range")
     override suspend fun changeHSVColor(
         token: String,
-        lightIdx: Int,
+        lightId: Int,
         @IntRange(from = 0, to = 255)
         brightness: Int,
         @IntRange(from = 0, to = 255)
@@ -160,7 +160,7 @@ class BridgeController(bridgeIp: String) : IBridgeController {
         hue: Int
     ) {
         return bridgeControlApi.changeColor(
-            token, lightIdx, BridgeLightRequestBody(
+            token, lightId, BridgeLightRequestBody(
                 on = true,
                 brightness = brightness,
                 saturation = saturation,
