@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'maven-publish'
+apply plugin: 'com.github.dcendents.android-maven'
 
 repositories {
     mavenCentral()
@@ -95,7 +96,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.reno.philipshue'
                 artifactId = 'philipshue-library'
-                version = '1.0.2'
+                version = '1.0.3'
             }
         }
     }
