@@ -1,4 +1,21 @@
 # PhillipsHue Android Library
+[![](https://jitpack.io/v/renovatio0424/philips-hue-library.svg)](https://jitpack.io/#renovatio0424/philips-hue-library)
+## Dependencies
+Add it in your root `build.gradle`
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+``` 
+Add it in your project `build.gradle`
+```groovy
+dependencies {
+    implementation 'com.github.renovatio0424:philips-hue-library:1.0.3'
+}
+```
 
 ## How to use it
 
