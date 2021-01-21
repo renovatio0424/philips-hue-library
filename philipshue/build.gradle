@@ -95,7 +95,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.reno.philipshue'
                 artifactId = 'philipshue-library'
-                version = '1.0.1'
+                version = '1.0.2'
             }
         }
     }
