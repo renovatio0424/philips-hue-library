@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'maven-publish'
+
 android {
     compileSdkVersion 30
 
@@ -73,4 +75,18 @@ dependencies {
     testImplementation "io.mockk:mockk:1.9.3"
 
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.reno.philipshue'
+                artifactId = 'philipshue-library'
+                version = '1.0.1'
+            }
+        }
+    }
 }
